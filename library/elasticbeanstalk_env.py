@@ -170,20 +170,26 @@ def wait_for(ebs, app_name, env_name, wait_timeout, testfunc):
 
         time.sleep(15)
 
+
 def version_is_updated(version_label, env):
-    return version_label == ""  or env["VersionLabel"] == version_label
+    return version_label == "" or env["VersionLabel"] == version_label
+
 
 def status_is_ready(env):
     return env["Status"] == "Ready"
 
+
 def health_is_green(env):
     return env["Health"] == "Green"
+
 
 def health_is_grey(env):
     return env["Health"] == "Grey"
 
+
 def terminated(env):
     return env["Status"] == "Terminated"
+
 
 def describe_env(ebs, app_name, env_name, ignored_statuses):
     environment_names = [] if env_name is None else [env_name]
@@ -191,15 +197,18 @@ def describe_env(ebs, app_name, env_name, ignored_statuses):
     result = ebs.describe_environments(ApplicationName=app_name, EnvironmentNames=environment_names)
     envs = result["Environments"]
 
-    if not isinstance(envs, list): return None
+    if not isinstance(envs, list):
+        return None
 
     for env in envs:
-        if env.has_key("Status") and env["Status"] in ignored_statuses:
+        if "Status" in env and env["Status"] in ignored_statuses:
             envs.remove(env)
 
-    if len(envs) == 0: return None
+    if len(envs) == 0:
+        return None
 
     return envs if env_name is None else envs[0]
+
 
 def describe_env_config_settings(ebs, app_name, env_name):
     result = ebs.describe_configuration_settings(ApplicationName=app_name, EnvironmentName=env_name)
@@ -208,21 +217,23 @@ def describe_env_config_settings(ebs, app_name, env_name):
     if not isinstance(envs, list): return None
 
     for env in envs:
-        if env.has_key("Status") and env["Status"] in ["Terminated","Terminating"]:
+        if "Status" in env and env["Status"] in ["Terminated", "Terminating"]:
             envs.remove(env)
 
-    if len(envs) == 0: return None
+    if len(envs) == 0:
+        return None
 
     return envs if env_name is None else envs[0]
+
 
 def update_required(ebs, env, params):
     updates = []
     if params["version_label"] and env["VersionLabel"] != params["version_label"]:
         updates.append(('VersionLabel', env['VersionLabel'], params['version_label']))
 
-    if params.get("template_name", None) and not env.has_key("TemplateName"):
+    if params.get("template_name", None) and "TemplateName" not in env:
         updates.append(('TemplateName', None, params['template_name']))
-    elif env.has_key("TemplateName") and env["TemplateName"] != params["template_name"]:
+    elif "TemplateName" in env and env["TemplateName"] != params["template_name"]:
         updates.append(('TemplateName', env['TemplateName'], params['template_name']))
 
     result = ebs.describe_configuration_settings(ApplicationName=params["app_name"],
@@ -237,10 +248,10 @@ def update_required(ebs, env, params):
 
     return updates
 
+
 def new_or_changed_option(options, setting):
     for option in options:
-        if option["Namespace"] == setting["Namespace"] and \
-            option["OptionName"] == setting["OptionName"]:
+        if option["Namespace"] == setting["Namespace"] and option["OptionName"] == setting["OptionName"]:
 
             if (setting['Namespace'] in ['aws:autoscaling:launchconfiguration','aws:ec2:vpc'] and \
                 setting['OptionName'] in ['SecurityGroups', 'ELBSubnets', 'Subnets'] and \
@@ -252,6 +263,7 @@ def new_or_changed_option(options, setting):
                     return (option["Namespace"] + ':' + option["OptionName"], option["Value"], setting["Value"])
 
     return (setting["Namespace"] + ':' + setting["OptionName"], "<NEW>", setting["Value"])
+
 
 def check_env(ebs, app_name, env_name, module):
     state = module.params['state']
