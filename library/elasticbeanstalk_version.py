@@ -169,8 +169,10 @@ def check_version(ebs, version, module):
 
     module.exit_json(**result)
 
+
 def filter_empty(**kwargs):
-    return {k:v for k,v in kwargs.iteritems() if v}
+    return {k: v for k, v in kwargs.items() if v}
+
 
 def main():
     argument_spec = ec2_argument_spec()
@@ -226,7 +228,6 @@ def main():
         check_version(ebs, version, module)
         module.fail_json(msg='ASSERTION FAILURE: check_version() should not return control.')
 
-
     if state == 'present':
         if version is None:
             create_req = ebs.create_application_version(**filter_empty(ApplicationName=app_name,
@@ -261,6 +262,7 @@ def main():
         result = dict(changed=False, versions=versions)
 
     module.exit_json(**result)
+
 
 if __name__ == '__main__':
     main()
