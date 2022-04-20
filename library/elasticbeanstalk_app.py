@@ -97,13 +97,16 @@ try:
 except ImportError:
     HAS_BOTO3 = False
 
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.ec2 import boto3_conn, ec2_argument_spec, get_aws_connection_info
+
 
 def describe_app(ebs, app_name):
     apps = list_apps(ebs, app_name)
 
     return None if len(apps) != 1 else apps[0]
+
 
 def list_apps(ebs, app_name):
     if app_name is not None:
@@ -112,6 +115,7 @@ def list_apps(ebs, app_name):
         apps = ebs.describe_applications()
 
     return apps.get("Applications", [])
+
 
 def check_app(ebs, app, module):
     app_name = module.params['app_name']
@@ -133,8 +137,10 @@ def check_app(ebs, app, module):
 
     module.exit_json(**result)
 
+
 def filter_empty(**kwargs):
-    return {k:v for k,v in kwargs.iteritems() if v}
+    return {k: v for k, v in kwargs.items() if v}
+
 
 def main():
     argument_spec = ec2_argument_spec()
