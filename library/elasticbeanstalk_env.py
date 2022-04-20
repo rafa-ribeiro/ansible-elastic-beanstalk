@@ -353,7 +353,7 @@ def main():
 
     if state == 'present':
         try:
-            tags_to_apply = [ {'Key':k,'Value':v} for k,v in tags.iteritems()]
+            tags_to_apply = [ {'Key':k,'Value':v} for k,v in tags.items()]
             ebs.create_environment(**filter_empty(ApplicationName=app_name,
                                                   EnvironmentName=env_name,
                                                   VersionLabel=version_label,
